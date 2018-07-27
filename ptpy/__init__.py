@@ -1,6 +1,7 @@
 '''Master module that instantiates the correct extension and transport.'''
 from __future__ import absolute_import
 from .extensions.canon import Canon
+from .extensions.fulldome import Fulldome
 from .extensions.microsoft import Microsoft
 from .extensions.parrot import Parrot
 from .extensions.nikon import Nikon
@@ -37,6 +38,7 @@ if 'PTPY_DEBUG_LOG' in os.environ:
 __all__ = (
     # Extensions
     'Canon',
+    'Fulldome',
     'Microsoft',
     'Nikon',
     'Sony',
