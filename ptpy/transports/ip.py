@@ -40,15 +40,15 @@ def create_connection(address):
 
     host, port = address
     err = None
-    for res in socket.getaddrinfo(host, port, 0, socket.SOCK_STREAM):
+    for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
         af, socktype, proto, canonname, sa = res
         sock = None
         try:
             sock = socket.socket(af, socktype, proto)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-            if 'darwin' not in sys.platform:
+            if sys.platform not in ['darwin', 'win32']:
                 sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
-            sock.setsockopt(socket.IPPROTO_TCP, socket.SO_KEEPALIVE, 1)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
             sock.connect(sa)
             return sock
 
@@ -244,7 +244,7 @@ class IPTransport(object):
         # Event Connection Establishment
         self.__evtcon = create_connection((host, port))
         self.__evtcon.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self.__evtcon.setsockopt(socket.IPPROTO_TCP, socket.SO_KEEPALIVE, 1)
+        self.__evtcon.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 
         # Send InitEvent
         payload = self.__InitEvent.build(Container(
@@ -332,8 +332,8 @@ class IPTransport(object):
         # Yet another arbitrary string type. Max-length CString utf8-encoded
         self.__PTPIPString = ExprAdapter(
             RepeatUntil(
-                lambda obj, ctx, lst:
-                six.unichr(obj) in '\x00' or len(lst) == 40, Int16ul
+                lambda obj, ctx:
+                six.unichr(obj) in '\x00', Int16ul
             ),
             encoder=lambda obj, ctx:
             [] if len(obj) == 0 else[ord(c) for c in six.text_type(obj)]+[0],
@@ -568,10 +568,22 @@ class IPTransport(object):
         # Don't modify original container to keep abstraction barrier.
         ptp = Container(**ptp_container)
         # Send data
-        ptp['Type'] = 'Data'
+        ptp['Type'] = 'StartData'
         ptp['DataphaseInfo'] = 'Out'
-        ptp['Payload'] = data
+        ptp['TotalDataLength'] = len(data)
+        ptp['Payload'] = self.__StartData.build(ptp)
         self.__send(ptp)
+
+        payload = self.__EndData.build(Container(
+            ptp,
+            Data=data,
+        ), Length=(len(data) + self.__Header.sizeof() + self._TransactionID.sizeof()))
+
+        enddata_packet = Container(
+            Type='EndData',
+            Payload=payload,
+        )
+        self.__send(enddata_packet)
 
     # Actual implementation
     # ---------------------
