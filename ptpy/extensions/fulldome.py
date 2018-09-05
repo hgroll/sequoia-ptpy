@@ -3,7 +3,8 @@
 Use it in a master module that determines the vendor and automatically uses its
 extension.
 '''
-from time import time, sleep
+from time import sleep
+from datetime import datetime
 import socket
 from ptpy.transports.ip import create_connection, actual_socket
 from construct import (
@@ -95,166 +96,32 @@ class Fulldome(object):
         return self.mesg(ptp)
     def SyncTime(self):
         '''Sync Time with Host'''
-        self.set_device_prop_value('DateTime', datetime.now())
+        self.set_device_prop_value('DateTime', str(datetime.now()).encode())
 
     def StartRecording(self):
-        logger.debug(self.get_device_info())
-        logger.debug(self.get_object_handles(0, all_storage_ids=True, in_root=True))
-        logger.debug(self.get_storage_ids())
-        logger.debug(self.get_object_handles(0x00020001, in_root=True))
-        logger.debug(self.get_device_prop_desc('CameraMode'))
-        logger.debug(self.get_device_prop_value('CameraMode'))
-        sleep(1)
-        # get device info
-        logger.debug(self.get_device_info())
-        logger.debug(self.get_device_prop_desc(0xd7fe))
-        sleep(1)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1)
-        logger.debug(self.get_device_prop_desc(0xd7ab))
-        sleep(1)
-        logger.debug(self.get_device_prop_desc(0xd7ab))
-        sleep(1)
-        logger.debug(self.get_device_prop_desc(0xd7ae))
-        sleep(1)
-        logger.debug(self.get_device_prop_desc('WhiteBalance'))
-        sleep(1)
-        logger.debug(self.get_device_prop_desc('VideoResolution'))
-        sleep(1)
-        logger.debug(self.get_device_prop_desc('ImageSize'))
-        sleep(1)
-        logger.debug(self.get_device_prop_desc(0xd607))
-        sleep(1)
-        logger.debug(self.get_device_prop_value('Artist'))
-        sleep(1)
-        # GetDate
-        # SetDate
-        logger.debug(self.get_device_prop_desc(0xd801))
-        sleep(1)
-        logger.debug(self.get_device_prop_desc('RecordProperty1'))
-        logger.debug(self.get_device_prop_value('RecordProperty1'))
-        sleep(1)
-        logger.debug(self.get_device_prop_desc(0xd7ab))
-        sleep(1)
-        logger.debug(self.SetCameraMode(3))
-        sleep(1)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1)
-        logger.debug(self.get_device_prop_value('ImageSize'))
-        sleep(1)
-        # GetStorageIDs
-        logger.debug(self.get_storage_ids())
-        logger.debug(self.get_storage_info(0x00020001))
-        logger.debug(self.get_storage_info(0x00020001))
-        logger.debug(self.get_device_prop_desc('BatteryLevel'))
-        logger.debug(self.get_device_prop_value('BatteryLevel'))
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        #
-        #
-        # switch to video mode
-        #
-        #
-        logger.debug(self.get_storage_info(0x00020001))
-        logger.debug(self.get_device_prop_desc('RecordProperty3'))
-        logger.debug(self.get_device_prop_desc(0xd7ab))
-        logger.debug(self.SetCameraMode(1))
-        sleep(1)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1)
-        logger.debug(self.get_device_prop_value('VideoResolution'))
-        logger.debug(self.get_device_prop_desc('RecordProperty1'))
-        logger.debug(self.get_device_prop_value('RecordProperty1'))
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-
-        # Connect to RTSP
-        self.rtsp_init()
-        
-        # Video Aufnahme
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.get_device_prop_desc('RecordProperty1'))
-        logger.debug(self.get_device_prop_value('RecordProperty1'))
-        logger.debug(self.get_device_prop_value('VideoResolution'))
-        logger.debug(self.get_device_prop_desc('RecordProperty3'))
-        logger.debug(self.SetCameraMode(17))
-        logger.debug(self.SendUnknownCommand())
-        sleep(1)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-
-        # Disconnect RTSP
-        self.rtsp_exit()        
-
-        # Turn Video Off
-        logger.debug(self.SetCameraMode(3))
-
-    def StartRecordingSimple(self):
         #
         #
         # switch to video mode
         #
         #
         logger.debug(self.SetCameraMode(1))
-        sleep(1)
-
-        #logger.debug(self.SendUnknownCommand())
-        #sleep(1.5)
 
         # Connect to RTSP
         self.rtsp_init()
         
-        # Video Aufnahme
+        # start record mode
         logger.debug(self.SetCameraMode(17))
-        logger.debug(self.SendUnknownCommand())
-        sleep(1)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-        logger.debug(self.SendUnknownCommand())
-        sleep(1.5)
-
-        # Disconnect RTSP
-        self.rtsp_exit()        
-
-        # Turn Video Off
-        logger.debug(self.SetCameraMode(3))
-
     
+    def StopRecording(self):
+        # Disconnect RTSP
+        self.rtsp_exit()        
+
+        # Turn Video Off
+        logger.debug(self.SetCameraMode(3))
+
+
+    def StartStopRecording(self, recordingTime):
+        self.StartRecording()
+        sleep(recordingTime)
+        self.StopRecording()
+
